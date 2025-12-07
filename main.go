@@ -7,6 +7,7 @@ import (
 
 	"github.com/eclipseron/digital-wallet-app/conf"
 	"github.com/eclipseron/digital-wallet-app/controller"
+	"github.com/eclipseron/digital-wallet-app/middleware"
 )
 
 func main() {
@@ -22,7 +23,8 @@ func main() {
 		IdleTimeout:  20 * time.Second,
 	}
 
-	http.HandleFunc("GET /api/v1/accounts/{accountId}/balance", c.GetAccountBalanceHandler)
+	http.Handle("GET /api/v1/accounts/{accountId}/balance",
+		middleware.RequireAuth(http.HandlerFunc(c.GetAccountBalanceHandler)))
 	http.HandleFunc("POST /api/v1/register", c.RegisterHandler)
 	http.HandleFunc("POST /api/v1/login", c.LoginHandler)
 

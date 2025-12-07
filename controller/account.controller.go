@@ -7,6 +7,7 @@ import (
 	"time"
 
 	"github.com/eclipseron/digital-wallet-app/dto"
+	"github.com/eclipseron/digital-wallet-app/middleware"
 	"github.com/google/uuid"
 )
 
@@ -22,6 +23,14 @@ func (c *Controller) GetAccountBalanceHandler(w http.ResponseWriter, r *http.Req
 		detail := err.Error()
 		w.WriteHeader(http.StatusBadRequest)
 		response.Data = dto.ErrorModel{Message: "invalid id", Details: []*string{&detail}}
+		json.NewEncoder(w).Encode(&response)
+		return
+	}
+
+	_uid, ok := r.Context().Value(middleware.USERID).(string)
+	if !ok || _uid == "" {
+		w.WriteHeader(http.StatusUnauthorized)
+		response.Data = dto.ErrorModel{Message: "unauthorized"}
 		json.NewEncoder(w).Encode(&response)
 		return
 	}
@@ -51,6 +60,13 @@ func (c *Controller) GetAccountBalanceHandler(w http.ResponseWriter, r *http.Req
 		detail := tx.Error.Error()
 		w.WriteHeader(http.StatusInternalServerError)
 		response.Data = dto.ErrorModel{Message: "an error occured", Details: []*string{&detail}}
+		json.NewEncoder(w).Encode(&response)
+		return
+	}
+	if _uid != account.UserId.String() {
+		detail := "This account does not belong to the user"
+		w.WriteHeader(http.StatusUnauthorized)
+		response.Data = dto.ErrorModel{Message: "unauthorized", Details: []*string{&detail}}
 		json.NewEncoder(w).Encode(&response)
 		return
 	}
