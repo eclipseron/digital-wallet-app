@@ -24,7 +24,13 @@ func (c *Controller) RegisterHandler(w http.ResponseWriter, r *http.Request) {
 		Password string `json:"password"`
 	}
 	var payload RequestModel
-	json.NewDecoder(r.Body).Decode(&payload)
+	if err := json.NewDecoder(r.Body).Decode(&payload); err != nil {
+		detail := err.Error()
+		w.WriteHeader(http.StatusBadRequest)
+		response.Data = dto.ErrorModel{Message: "invalid request body", Details: []*string{&detail}}
+		json.NewEncoder(w).Encode(&response)
+		return
+	}
 
 	if payload.Email == "" || payload.Password == "" || payload.Name == "" {
 		w.WriteHeader(http.StatusBadRequest)
@@ -110,7 +116,13 @@ func (c *Controller) LoginHandler(w http.ResponseWriter, r *http.Request) {
 		Password string `json:"password"`
 	}
 	var payload RequestModel
-	json.NewDecoder(r.Body).Decode(&payload)
+	if err := json.NewDecoder(r.Body).Decode(&payload); err != nil {
+		detail := err.Error()
+		w.WriteHeader(http.StatusBadRequest)
+		response.Data = dto.ErrorModel{Message: "invalid request body", Details: []*string{&detail}}
+		json.NewEncoder(w).Encode(&response)
+		return
+	}
 
 	if payload.Email == "" || payload.Password == "" {
 		w.WriteHeader(http.StatusBadRequest)

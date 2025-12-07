@@ -8,11 +8,12 @@ import (
 	"github.com/eclipseron/digital-wallet-app/conf"
 	"github.com/eclipseron/digital-wallet-app/controller"
 	"github.com/eclipseron/digital-wallet-app/middleware"
+	"github.com/eclipseron/digital-wallet-app/migrations"
 )
 
 func main() {
 	db := conf.SetupDB()
-	// migrations.Run(db)
+	migrations.Run(db)
 
 	c := controller.NewController(db)
 
@@ -25,6 +26,8 @@ func main() {
 
 	http.Handle("GET /api/v1/accounts/{accountId}/balance",
 		middleware.RequireAuth(http.HandlerFunc(c.GetAccountBalanceHandler)))
+	http.Handle("POST /api/v1/transaction/withdraw",
+		middleware.RequireAuth(http.HandlerFunc(c.WithdrawHandler)))
 	http.HandleFunc("POST /api/v1/register", c.RegisterHandler)
 	http.HandleFunc("POST /api/v1/login", c.LoginHandler)
 

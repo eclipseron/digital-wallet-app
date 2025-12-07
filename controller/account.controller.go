@@ -27,13 +27,7 @@ func (c *Controller) GetAccountBalanceHandler(w http.ResponseWriter, r *http.Req
 		return
 	}
 
-	_uid, ok := r.Context().Value(middleware.USERID).(string)
-	if !ok || _uid == "" {
-		w.WriteHeader(http.StatusUnauthorized)
-		response.Data = dto.ErrorModel{Message: "unauthorized"}
-		json.NewEncoder(w).Encode(&response)
-		return
-	}
+	_uid, _ := r.Context().Value(middleware.USERID).(string)
 
 	type Account struct {
 		ID            uuid.UUID `json:"accountId"`
@@ -65,8 +59,8 @@ func (c *Controller) GetAccountBalanceHandler(w http.ResponseWriter, r *http.Req
 	}
 	if _uid != account.UserId.String() {
 		detail := "This account does not belong to the user"
-		w.WriteHeader(http.StatusUnauthorized)
-		response.Data = dto.ErrorModel{Message: "unauthorized", Details: []*string{&detail}}
+		w.WriteHeader(http.StatusForbidden)
+		response.Data = dto.ErrorModel{Message: "forbidden", Details: []*string{&detail}}
 		json.NewEncoder(w).Encode(&response)
 		return
 	}
