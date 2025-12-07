@@ -64,6 +64,7 @@ func (c *Controller) GetAccountBalanceHandler(w http.ResponseWriter, r *http.Req
 		json.NewEncoder(w).Encode(&response)
 		return
 	}
+	account.UpdatedAt = account.UpdatedAt.UTC()
 	response.Data = account
 	json.NewEncoder(w).Encode(&response)
 }
