@@ -23,6 +23,8 @@ func main() {
 	}
 
 	http.HandleFunc("GET /api/v1/accounts/{accountId}/balance", c.GetAccountBalanceHandler)
+	http.HandleFunc("POST /api/v1/register", c.RegisterHandler)
+	http.HandleFunc("POST /api/v1/login", c.LoginHandler)
 
 	if err := s.ListenAndServe(); err != nil {
 		log.Fatal("Failed to start server: ", err)
